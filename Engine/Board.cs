@@ -36,7 +36,6 @@ namespace Engine
 			m_ColumnsNumber = i_ColumnsNumber;
 			m_Board = new char[m_RowsNumber, m_ColumnsNumber];
 			initBoard();
-
         }
 
 		private void initBoard()
@@ -45,18 +44,14 @@ namespace Engine
 			{
 				for (int j = 0; j < Columns; j++)
 				{
-					SetCell(i, j,  ' ');
+					SetCell(i+1, j+1,  ' ');
 				}
 			}	
 		}
 
 		private bool isValidBoard(int i_RowsNumber, int i_ColumnsNumber)
         {
-            bool isValid = false;
-            if((4 <= i_RowsNumber && 8 >= i_RowsNumber) && (4 <= i_ColumnsNumber && 8 >= i_ColumnsNumber))
-            {
-                isValid = true;
-            }
+            bool isValid = (4 <= i_RowsNumber && 8 >= i_RowsNumber) && (4 <= i_ColumnsNumber && 8 >= i_ColumnsNumber);
 
             return isValid;
         }
@@ -68,25 +63,30 @@ namespace Engine
             { 
                 if(currentColumn == 0)
                 {
-                    Console.Write("   "); //3 blank spaces
+                    Console.Write("    "); //4 blank spaces
                 }
                 else
                 {
-                    Console.Write($"{currentColumn}   "); //3 blank spaces
+                    Console.Write($"{currentColumn}    "); //4 blank spaces
 				}
             }
 
             Console.WriteLine("");
-            for (int currentRow = 1; currentRow <= Rows; ++currentRow)
+            for (int currentRow = 0; currentRow < Rows; ++currentRow)
             {
-                for (int currentColumn = 0; currentColumn < Columns + 1; currentColumn++)
+                for (int currentColumn = 0; currentColumn < Columns; currentColumn++)
                 {
-                    Console.Write("|   {getCell(currentRow currentColumn)}   "); //3  blank spaces from each side
+                    Console.Write($"|  {GetCell(currentRow+1, currentColumn+1)}  "); //2  blank spaces from each side
 
 				}
 
-                Console.Write("|"); // add closing to the last one
-				Console.WriteLine("========================="); // TODO needs to be as the length of the row
+                Console.WriteLine("|"); // add closing to the last one
+                for (int currentColumn = 0; currentColumn < Columns + 1; currentColumn++)
+                {
+                    Console.Write("======"); //3  blank spaces from each side
+
+                }
+				Console.WriteLine(""); 
 			}
         }
 
@@ -162,7 +162,7 @@ namespace Engine
             int count = 1;
             bool winExists = false;
 
-			while (i_UserSign == GetCell(i_LastRowInsert, i) && (i > 0))
+			while ((i > 0) && i_UserSign == GetCell(i_LastRowInsert, i) )
             {
                 ++count;
                 --i;
@@ -171,7 +171,7 @@ namespace Engine
             if(count < k_AmountToWin)
             {
                 i = i_LastColumnInsert + 1;
-                while(i_UserSign == GetCell(i_LastRowInsert, i) && (i <= Columns))
+                while((i <= Columns) && i_UserSign == GetCell(i_LastRowInsert, i) )
                 {
                     ++count;
                     ++i;
@@ -191,7 +191,7 @@ namespace Engine
 			bool winExists = false;
 			int countLastingSign = 0, rowIndex = i_LastRowInsert  -  1;
 
-			while (i_UserSign == GetCell(rowIndex, i_LastColumnInsert) && rowIndex < Rows)
+			while ((rowIndex < Rows) && i_UserSign == GetCell(rowIndex, i_LastColumnInsert) )
 			{
 				countLastingSign++;
 				rowIndex++;
@@ -212,7 +212,7 @@ namespace Engine
             int j = i_LastColumnInsert - 1;
             int count = 1;
 
-            while (i_UserSign == GetCell(i, j) && i > 0 && j > 0)
+            while (i > 0 && j > 0 && i_UserSign == GetCell(i, j))
             {
                 count++;
                 i--;
@@ -224,7 +224,7 @@ namespace Engine
                 i = i_LastRowInsert + 1;
                 j = i_LastColumnInsert + 1;
 
-                while(i_UserSign == GetCell(i, j) && i <= Rows && j <= Columns)
+                while(i <= Rows && j <= Columns && i_UserSign == GetCell(i, j))
                 {
                     count++;
                     i++;
@@ -246,7 +246,7 @@ namespace Engine
 			bool winExists = false;
 			int countLastingSign = 0, rowIndex = i_LastRowInsert + 1, columnIndex = i_LastColumnInsert - 1;
 			
-			while (i_UserSign == GetCell(rowIndex, columnIndex) && rowIndex <= Rows && columnIndex > 0)
+			while ((rowIndex <= Rows && columnIndex > 0) && i_UserSign == GetCell(rowIndex, columnIndex))
 			{
 				countLastingSign++;
 				rowIndex++;
@@ -261,7 +261,7 @@ namespace Engine
 			rowIndex = i_LastRowInsert - 1;
 			columnIndex = i_LastColumnInsert + 1;
 
-			while (!winExists && i_UserSign == GetCell(rowIndex, columnIndex) && rowIndex > 0 && columnIndex <= Columns)
+			while (!winExists && (rowIndex > 0 && columnIndex <= Columns) && i_UserSign == GetCell(rowIndex, columnIndex))
 			{
 				countLastingSign++;
 				rowIndex--;
@@ -285,8 +285,24 @@ namespace Engine
                    checkPosSlopeDiagnol(row, col, sign);
         }
 
-    
-	}
+        public int GetRowByPlayerColumnChoice(int i_ColumnChoice)
+        {
+			int returnRowIndex = -1;
+
+            for(int rowIndex = Rows - 1; rowIndex > 0; --rowIndex)
+            {
+				if (GetCell(rowIndex+1, i_ColumnChoice) == ' ')
+                {
+                    returnRowIndex = rowIndex+1;
+                    break;
+                }
+            }
+
+            return returnRowIndex;
+        }
+
+
+    }
 }
 
 
