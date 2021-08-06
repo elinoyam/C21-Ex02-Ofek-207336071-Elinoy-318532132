@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Engine
 {
@@ -39,11 +35,22 @@ namespace Engine
 			m_RowsNumber = i_RowsNumber;
 			m_ColumnsNumber = i_ColumnsNumber;
 			m_Board = new char[m_RowsNumber, m_ColumnsNumber];
-
+			initBoard();
 
         }
 
-        private bool isValidBoard(int i_RowsNumber, int i_ColumnsNumber)
+		private void initBoard()
+		{
+			for (int i = 0; i < Rows; i++)
+			{
+				for (int j = 0; j < Columns; j++)
+				{
+					SetCell(i, j,  ' ');
+				}
+			}	
+		}
+
+		private bool isValidBoard(int i_RowsNumber, int i_ColumnsNumber)
         {
             bool isValid = false;
             if((4 <= i_RowsNumber && 8 >= i_RowsNumber) && (4 <= i_ColumnsNumber && 8 >= i_ColumnsNumber))
@@ -72,12 +79,14 @@ namespace Engine
             Console.WriteLine("");
             for (int currentRow = 1; currentRow <= Rows; ++currentRow)
             {
-                for (int currentColumn = 0; currentColumn < COLS + 1; currentColumn++)
+                for (int currentColumn = 0; currentColumn < Columns + 1; currentColumn++)
                 {
                     Console.Write("|   {getCell(currentRow currentColumn)}   "); //3  blank spaces from each side
 
 				}
-				Console.WriteLine("========================="); // needs to be as the length of the row
+
+                Console.Write("|"); // add closing to the last one
+				Console.WriteLine("========================="); // TODO needs to be as the length of the row
 			}
         }
 
@@ -131,21 +140,150 @@ namespace Engine
 
 			return columnIsFull;
 		}
-    }
+
+		private bool checkIfBoardIsFull()
+        {
+			bool boardIsFull = true;
+
+			for(int i = 0; i < Columns && boardIsFull;  i++)
+            {
+                if (!checkIfColumnIsFull(i + 1))
+                {
+					boardIsFull = false;
+				}
+            }
+				
+			return boardIsFull;
+        }
+
+        private bool checkRowToWin(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign)
+        {
+            int i = i_LastColumnInsert - 1;
+            int count = 1;
+            bool winExists = false;
+
+			while (i_UserSign == GetCell(i_LastRowInsert, i) && (i > 0))
+            {
+                ++count;
+                --i;
+            }
+
+            if(count < k_AmountToWin)
+            {
+                i = i_LastColumnInsert + 1;
+                while(i_UserSign == GetCell(i_LastRowInsert, i) && (i <= Columns))
+                {
+                    ++count;
+                    ++i;
+                }
+                winExists = (count >= k_AmountToWin);
+			}
+            else
+            {
+                winExists = true;
+            }
+            
+            return winExists;
+        } 
+
+		private bool checkColumnToWin(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign)
+        {
+			bool winExists = false;
+			int countLastingSign = 0, rowIndex = i_LastRowInsert  -  1;
+
+			while (i_UserSign == GetCell(rowIndex, i_LastColumnInsert) && rowIndex < Rows)
+			{
+				countLastingSign++;
+				rowIndex++;
+			}
+
+			if (countLastingSign >= k_AmountToWin)
+            {
+				winExists = true;
+			}
+		
+			return winExists;
+        }
+
+        private bool checkNegSlopeDiagnol(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign) // it's this \
+		{
+            bool winExists = false;
+			int i = i_LastRowInsert - 1;
+            int j = i_LastColumnInsert - 1;
+            int count = 1;
+
+            while (i_UserSign == GetCell(i, j) && i > 0 && j > 0)
+            {
+                count++;
+                i--;
+                j--;
+            }
+
+            if(count < k_AmountToWin)
+            {
+                i = i_LastRowInsert + 1;
+                j = i_LastColumnInsert + 1;
+
+                while(i_UserSign == GetCell(i, j) && i <= Rows && j <= Columns)
+                {
+                    count++;
+                    i++;
+                    j++;
+                }
+
+                winExists = (count >= k_AmountToWin);
+            }
+			else
+            {
+                winExists = true;
+            }
+
+            return winExists;
+        } 
+
+		private bool checkPosSlopeDiagnol(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign) 
+        {
+			bool winExists = false;
+			int countLastingSign = 0, rowIndex = i_LastRowInsert + 1, columnIndex = i_LastColumnInsert - 1;
+			
+			while (i_UserSign == GetCell(rowIndex, columnIndex) && rowIndex <= Rows && columnIndex > 0)
+			{
+				countLastingSign++;
+				rowIndex++;
+				columnIndex--;
+			}
+			if (countLastingSign >= k_AmountToWin)
+            {
+				winExists = true;
+
+			}
+
+			rowIndex = i_LastRowInsert - 1;
+			columnIndex = i_LastColumnInsert + 1;
+
+			while (!winExists && i_UserSign == GetCell(rowIndex, columnIndex) && rowIndex > 0 && columnIndex <= Columns)
+			{
+				countLastingSign++;
+				rowIndex--;
+				columnIndex++;
+			}
+
+			if (countLastingSign >= k_AmountToWin)
+			{
+				winExists = true;
+			}
+
+			return winExists;
+		}
+	
+
+
+	}
 }
 
 
 
 /*
- *
- *#define _CRT_SECURE_NO_WARNINGS
-#include "stdio.h"
-#include "stdlib.h"
-#include <stdbool.h>
-
-//Ofek Shavit 207330671
-//This define is for comparing sequence of the same sign to win against how much I have.
-#define AMOUNT_TO_WIN 4
 
 /// This function initializes the game board by assigning each cell
 /// with ' ' (resulting with an empty game board).
@@ -242,48 +380,8 @@ int main()
 }//main
 
 
-void initBoard()
-{
-	int i, j;
-
-	for (i = 0; i < ROWS; i++)
-	{
-		for (j = 0; j < COLS; j++)
-		{
-			setCell(i + 1, j + 1, ' ');
-		}
-	}
-}
 
 
-void printBoard()
-{
-	int row;
-	int col;
-
-	//Print first row
-	for (col = 0; col < COLS + 1; col++)
-	{ //its better to do it opossite because it saves a check
-		if (col == 0)
-			printf(" ");
-		else
-			printf("   %d", col);
-	}
-	printf("\n");
-
-	for (row = 1; row <= ROWS; row++)
-	{
-		for (col = 0; col < COLS + 1; col++)
-		{
-			if (0 == col)
-				printf("%c", 'A' + row - 1);
-			else
-				printf("   %c", getCell(row, col));
-
-		}
-		printf("\n");
-	}
-}//printBoard
 
 void switchPlayer(char* activePlayer, char* sign)
 {
@@ -364,26 +462,6 @@ bool checkRow(int row, int col, char sign)
 	return count >= AMOUNT_TO_WIN;
 }//checkRow
 
-bool checkCol(int row, int col, char sign)
-{
-	int i = row - 1;
-	int count = 1;
-
-	while (sign == getCell(i, col) && i > 0)
-	{
-		count++;
-		i--;
-	}
-	if (count == AMOUNT_TO_WIN)
-		return true;
-	i = row + 1;
-	while (sign == getCell(i, col) && i <= ROWS)
-	{
-		count++;
-		i++;
-	}
-	return count >= AMOUNT_TO_WIN;
-}//checkCol
 
 bool checkNegSlopeDiagnol(int row, int col, char sign)
 {
