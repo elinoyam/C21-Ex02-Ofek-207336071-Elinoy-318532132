@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30717.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI", "C21 Ex02 Ofek 207336071 Elinoy 318532132\UI.csproj", "{1D449B04-3B92-4961-8FE4-2BEE55C409E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine", "Engine\Engine.csproj", "{BDC59DE0-F418-4FD8-A894-F65BF24F1F80}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1D449B04-3B92-4961-8FE4-2BEE55C409E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D449B04-3B92-4961-8FE4-2BEE55C409E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D449B04-3B92-4961-8FE4-2BEE55C409E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D449B04-3B92-4961-8FE4-2BEE55C409E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDC59DE0-F418-4FD8-A894-F65BF24F1F80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDC59DE0-F418-4FD8-A894-F65BF24F1F80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDC59DE0-F418-4FD8-A894-F65BF24F1F80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDC59DE0-F418-4FD8-A894-F65BF24F1F80}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {164C0AFA-1CC4-4B28-8C59-4B03CBBF72C5}
+	EndGlobalSection
+EndGlobal
