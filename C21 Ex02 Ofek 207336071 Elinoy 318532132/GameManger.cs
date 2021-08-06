@@ -76,6 +76,7 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
 
         public void GameLoop()
         {
+            m_Board.InitBoard();
             bool playing = true;
             bool tie = false;
             int playerColumnChoice;

@@ -35,10 +35,10 @@ namespace Engine
 			m_RowsNumber = i_RowsNumber;
 			m_ColumnsNumber = i_ColumnsNumber;
 			m_Board = new char[m_RowsNumber, m_ColumnsNumber];
-			initBoard();
+			InitBoard();
         }
 
-		private void initBoard()
+		public void InitBoard()
 		{
 			for (int i = 0; i < Rows; i++)
 			{
@@ -63,11 +63,11 @@ namespace Engine
             { 
                 if(currentColumn == 0)
                 {
-                    Console.Write("    "); //4 blank spaces
+                    Console.Write("   "); //3 blank spaces
                 }
                 else
                 {
-                    Console.Write($"{currentColumn}    "); //4 blank spaces
+                    Console.Write($"{currentColumn}     "); //5 blank spaces
 				}
             }
 
@@ -80,8 +80,9 @@ namespace Engine
 
 				}
 
-                Console.WriteLine("|"); // add closing to the last one
-                for (int currentColumn = 0; currentColumn < Columns + 1; currentColumn++)
+				Console.WriteLine("|"); // add closing to the last one
+                Console.Write("=");
+				for (int currentColumn = 0; currentColumn < Columns; currentColumn++)
                 {
                     Console.Write("======"); //3  blank spaces from each side
 
@@ -189,9 +190,9 @@ namespace Engine
 		private bool checkColumnToWin(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign)
         {
 			bool winExists = false;
-			int countLastingSign = 0, rowIndex = i_LastRowInsert  -  1;
+			int countLastingSign = 0, rowIndex = i_LastRowInsert;
 
-			while ((rowIndex < Rows) && i_UserSign == GetCell(rowIndex, i_LastColumnInsert) )
+			while ((rowIndex <= Rows) && i_UserSign == GetCell(rowIndex, i_LastColumnInsert) )
 			{
 				countLastingSign++;
 				rowIndex++;
@@ -289,7 +290,7 @@ namespace Engine
         {
 			int returnRowIndex = -1;
 
-            for(int rowIndex = Rows - 1; rowIndex > 0; --rowIndex)
+            for(int rowIndex = Rows - 1; rowIndex >= 0; --rowIndex)
             {
 				if (GetCell(rowIndex+1, i_ColumnChoice) == ' ')
                 {
@@ -311,7 +312,7 @@ namespace Engine
 
 /// This function initializes the game board by assigning each cell
 /// with ' ' (resulting with an empty game board).
-void initBoard();
+void InitBoard();
 
 /// This function gets a row number and a column number (a cell),
 /// and returns the character in that cell (could be 'X', 'O' or ' ').
@@ -375,7 +376,7 @@ int main()
 	char activePlayer = '2';
 	bool playing = true;
 	bool tie = false;
-	initBoard();
+	InitBoard();
 
 	while (playing && !tie)
 	{
