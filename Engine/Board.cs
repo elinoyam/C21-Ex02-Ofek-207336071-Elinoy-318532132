@@ -2,7 +2,7 @@
 
 namespace Engine
 {
-    class Board
+    public class Board
     {
 		private const int k_AmountToWin = 4;
         private readonly int m_RowsNumber;
@@ -141,7 +141,7 @@ namespace Engine
 			return columnIsFull;
 		}
 
-		private bool checkIfBoardIsFull()
+		public bool CheckIfBoardIsFull()
         {
 			bool boardIsFull = true;
 
@@ -275,9 +275,17 @@ namespace Engine
 
 			return winExists;
 		}
-	
 
 
+        public bool CheckWin(int row, int col, char sign)
+        {
+            return checkRowToWin(row, col, sign) ||
+                   checkColumnToWin(row, col, sign) ||
+                   checkNegSlopeDiagnol(row, col, sign) ||
+                   checkPosSlopeDiagnol(row, col, sign);
+        }
+
+    
 	}
 }
 
