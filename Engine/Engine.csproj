@@ -39,7 +39,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AIComputer.cs" />
     <Compile Include="Board.cs" />
+    <Compile Include="MinMaxAlgorithm.cs" />
     <Compile Include="Player.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

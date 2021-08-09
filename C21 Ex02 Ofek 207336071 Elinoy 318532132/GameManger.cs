@@ -17,7 +17,7 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
             m_SecondPlayer = i_Second;
         }
 
-        public int getPlayerChoice(out int o_ColumnChoice)
+        public int getPlayerChoice(out int o_ColumnChoice, out bool o_ToQuit)
         {
             bool choiceValid = false;
             int columnChoice = 0;
@@ -25,13 +25,16 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
             string inputFromUser;
             bool goodInput = false;
 
+            o_ToQuit = false;
+            o_ColumnChoice = -1;
+
             while (!choiceValid)
             {
-                Console.WriteLine($"Please enter column input (a number between 1-{m_Board.Columns}): ");
+                Console.WriteLine($"Please enter column input (a number between 1-{m_Board.Columns}) or Q to quit: ");
                 inputFromUser = Console.ReadLine();
                 goodInput = int.TryParse(inputFromUser, out columnChoice);
 
-                if (goodInput)
+                if(goodInput)
                 {
                     // 1 <= columnChoice <= Columns 
                     if(1 <= columnChoice && m_Board.Columns >= columnChoice)
@@ -39,6 +42,7 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
                         rowChoice = m_Board.GetRowByPlayerColumnChoice(columnChoice);
                         if(rowChoice != -1)
                         {
+                            o_ColumnChoice = columnChoice;
                             choiceValid = true;
                         }
                         else
@@ -50,15 +54,22 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
                     {
                         Console.WriteLine($"Error! you must enter a number between 1-{m_Board.Columns}! ");
                     }
-                    // choiceValid = m_Board. TODO check if valid input (column is full) and the nuber is in the right range
                 }
                 else
                 {
-                    Console.WriteLine($"Error! you must enter an integer number! ");
+                    if (inputFromUser == "Q")
+                    {
+                        o_ToQuit = true;
+                        o_ColumnChoice = -1;
+                        choiceValid = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Error! you must enter an integer number! ");
+                    }
                 }
             }
-
-            o_ColumnChoice = columnChoice;
+            
             return rowChoice;
         }
 
@@ -79,6 +90,7 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
             m_Board.InitBoard();
             bool playing = true;
             bool tie = false;
+            bool isQuit = false;
             int playerColumnChoice;
             int availableRow;
             char activeSign;
@@ -88,38 +100,49 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
             {
                 //print board
                 m_Board.PrintBoard();
-
+                
                 //get choice check if valid 
-                availableRow = getPlayerChoice(out playerColumnChoice);
+                availableRow = getPlayerChoice(out playerColumnChoice, out isQuit);
+                if(isQuit)
+                {
+                    playing = false;
+                    Ex02.ConsoleUtils.Screen.Clear();
+                    changeActivePlayer();
+                    break;
+                }
 
-                //set cell to bard
                 activeSign = GetActivePlayerSign();
                 m_Board.SetCell(availableRow, playerColumnChoice, activeSign);
 
-                //check if win
                 playing = !(CheckForWin(availableRow, playerColumnChoice, activeSign));
 
-                //check if tie
                 tie = CheckForTie();
 
-                //switch players
                 changeActivePlayer();
 
-                //clear screen
                 Ex02.ConsoleUtils.Screen.Clear();
             }
 
-            // print board
-            m_Board.PrintBoard();
+            if(!isQuit)
+            {
+                m_Board.PrintBoard();
+            }
 
 
             // TODO tell who won and show the count 1-2
-            PrintWins();
+            if(tie)
+            {
+                Console.WriteLine($"It's a tie!!! Better luck next time....");
+                Console.WriteLine($"{m_FirstPlayer.PlayerName} has won: {m_FirstPlayer.PlayerWinsCounter}. ");
+                Console.WriteLine($"{m_SecondPlayer.PlayerName} has won: {m_SecondPlayer.PlayerWinsCounter}. ");
+
+            }
+            else
+            {
+                PrintWins();
+            }
 
             // TODO new game will be at main
-
-
-
         }
 
         public char GetActivePlayerSign()

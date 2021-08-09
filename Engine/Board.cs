@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Engine
 {
@@ -245,7 +246,7 @@ namespace Engine
 		private bool checkPosSlopeDiagnol(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign) 
         {
 			bool winExists = false;
-			int countLastingSign = 0, rowIndex = i_LastRowInsert + 1, columnIndex = i_LastColumnInsert - 1;
+			int countLastingSign = 1, rowIndex = i_LastRowInsert + 1, columnIndex = i_LastColumnInsert - 1;
 			
 			while ((rowIndex <= Rows && columnIndex > 0) && i_UserSign == GetCell(rowIndex, columnIndex))
 			{
@@ -302,267 +303,96 @@ namespace Engine
             return returnRowIndex;
         }
 
+        // remove the last move made and change back to the other player
+        public void Unmove(int i_Col)
+        {
+			//find the place
+            for(int i = 0; i < m_ColumnsNumber; ++i)
+            {
+                if (GetCell(i+1, i_Col) != ' ')
+                {
+                    SetCell(i + 1, i_Col, ' ');
+                    //returnRowIndex = rowIndex + 1;
+                    break;
+                }
+			}
+            //tilesPerColumn[col]--;
+
+            //long position = ((long)1 << (tilesPerColumn[col] + 7 * col));
+
+            //if (CurrentOpponent == BoardState.BLACK)
+            //    numBlack ^= position;
+            //else
+            //    numRed ^= position;
+
+            //theBoard[tilesPerColumn[col], col] = BoardState.EMPTY;
+
+        }
+
+        // Gets all possible moves (7 or less) for the AI player
+        public List<int> GetPossibleMoves()
+        {
+            List<int> possibleMoves = new List<int>();
+
+            for (int i = 0; i < m_ColumnsNumber; i++)
+            {
+                if (checkIfColumnIsFull(i))
+                    possibleMoves.Add(i);
+            }
+            return possibleMoves;
+        }
+
+        public Board Copy()
+        {
+            Board newBoard = new Board(Rows, Columns);
+            //newBoard.CurrentPlayer = this.CurrentPlayer;
+            //newBoard.CurrentOpponent = this.CurrentOpponent;
+            //newBoard.numRed = this.numRed;
+            //newBoard.numBlack = this.numBlack;
+            //for (int i = 0; i < Width; i++)
+            //    newBoard.tilesPerColumn[i] = this.tilesPerColumn[i];
+
+            for (int i = 0; i < Rows; i++)
+            {
+                for (int j = 0; j < Columns; j++)
+                    newBoard.m_Board[i, j] = this.m_Board[i, j];
+            }
+            //newBoard.isGameOver = this.isGameOver;
+            //newBoard.Winner = this.Winner;
+
+            return newBoard;
+        }
+
+        public void MakeMove(int i_ColumnIndex, char i_ActivePlayerSign)
+        {
+            // Check if the move is valid, then place the piece
+            if (checkIfValidIndex(1,i_ColumnIndex))
+            {
+                // change the tile to be held by the current player
+                m_Board[GetRowByPlayerColumnChoice(i_ColumnIndex), i_ColumnIndex] = i_ActivePlayerSign;
+
+                //// increase the amount of black or red pieces on the board
+                //// used for determining the winner
+                //long position = ((long)1 << (tilesPerColumn[i_ColumnIndex] + 7 * i_ColumnIndex));
+                //if (CurrentPlayer == BoardState.BLACK)
+                //    numBlack ^= position;
+                //else
+                //    numRed ^= position;
+
+                //// increase the number of tiles in the column
+                //tilesPerColumn[i_ColumnIndex]++;
+
+                // check for a winner otherwise proceed to next player
+                /*if ((Winner = CheckWinState()) != null)
+                {
+                    isGameOver = true;
+                    return;
+                }
+                else*/
+                //NextPlayer();
+            }
+        }
 
     }
 }
 
-
-
-/*
-
-/// This function initializes the game board by assigning each cell
-/// with ' ' (resulting with an empty game board).
-void InitBoard();
-
-/// This function gets a row number and a column number (a cell),
-/// and returns the character in that cell (could be 'X', 'O' or ' ').
-/// For example:
-/// char c = getCell(1, 1);
-char getCell(int row, int col);
-
-/// This function gets a row number, a column number and a sign,
-/// and assigns the cell with the given sign.
-/// For example:
-/// setCell(1, 1, 'X');
-void setCell(int row, int col, char sign);
-
-/// This function clears the screen.
-void clearScreen();
-
-// This function prints the board frame.
-void printBoard();
-
-// This function switch the players.
-void switchPlayer(char* activePlayer, char* sign);
-
-// This function gets the player's choice.
-int getPlayerChoice();
-
-// This function checks the collom that the player chose.
-// It checks that it is between 1 and 7 and checks that the collom is not full.
-bool checkChoice(int col);
-
-//This function gets the first avialable row in a spesfic collom.
-int getAvilableRow(int col);
-
-// This function checks for a sequence signs in a row.
-bool checkRow(int row, int col, char sign);
-
-// This function checks for a sequence signs in a collom.
-bool checkCol(int row, int col, char sign);
-
-// This function checks for a sequence signs in a negative slope diagonal (\).
-bool checkNegSlopeDiagnol(int row, int col, char sign);
-
-// This function checks for a sequence signs in a positive slope diagonal (/).
-bool checkPosSlopeDiagnol(int row, int col, char sign);
-
-// This function checks for a win. it checks the row, collom and diagonals sequence signs.
-bool checkWin(int row, int col, char sign);
-
-// checkTie
- //This function checks for a tie
- //it gets noting
- //it returns true/false
-
-bool checkTie();
-
-int main()
-{
-	int row = 0;
-	int col = 0;
-	char choice = 0;
-	char sign = 'O';
-	char activePlayer = '2';
-	bool playing = true;
-	bool tie = false;
-	InitBoard();
-
-	while (playing && !tie)
-	{
-		switchPlayer(&activePlayer, &sign);
-		printBoard();
-
-		printf("\nPlayer number %c:\n", activePlayer);
-		col = getPlayerChoice();
-		row = getAvilableRow(col);
-
-		setCell(row, col, sign);
-		playing = !checkWin(row, col, sign);
-		tie = checkTie();
-		clearScreen();
-	}//while
-
-	printBoard();
-	if (tie)
-	{
-		printf("\nIt's a tie, no one won! be better next time \n");
-	}
-	else
-	{
-		printf("\nPlayer %c won!\n", activePlayer);
-	}
-}//main
-
-
-
-
-
-void switchPlayer(char* activePlayer, char* sign)
-{
-	if (*activePlayer == '1')
-	{
-		(*activePlayer)++;
-		*sign = 'O';
-	}
-	else
-	{
-		(*activePlayer)--;
-		*sign = 'X';
-	}
-}//switchPlayer
-
-int getPlayerChoice()
-{
-	bool choiceValid = false;
-	int choice = 0;
-
-	while (!choiceValid)
-	{
-		printf("Please enter column input (a number between 1-%d): ", COLS);
-		scanf("%d", &choice);
-		choiceValid = checkChoice(choice);
-	}
-
-	return choice;
-}//getPlayerChoice
-
-bool checkChoice(int col)
-{
-	if (!((col >= 1) && (col <= COLS)))
-	{
-		printf("Choice need to be between 1 and %d\n", COLS);
-		return false;
-	}
-
-	if (' ' != getCell(1, col))
-	{
-		printf("Col is full\n");
-		return false;
-	}
-
-	return true;
-}//checkChoice
-
-int getAvilableRow(int col)
-{
-	int row = 0;
-	for (row = ROWS + 1; row > 0; row--)
-	{
-		if (getCell(row, col) == ' ')
-		{
-			return row;
-		}
-	}
-}//getAvilableRow
-
-bool checkRow(int row, int col, char sign)
-{
-	int i = col - 1;
-	int count = 1;
-
-	while (sign == getCell(row, i) && i > 0)
-	{
-		count++;
-		i--;
-	}
-	if (count == AMOUNT_TO_WIN)
-		return true;
-	i = col + 1;
-	while (sign == getCell(row, i) && i <= COLS)
-	{
-		count++;
-		i++;
-	}
-	return count >= AMOUNT_TO_WIN;
-}//checkRow
-
-
-bool checkNegSlopeDiagnol(int row, int col, char sign)
-{
-	int i = row - 1;
-	int j = col - 1;
-	int count = 1;
-
-	while (sign == getCell(i, j) && i > 0 && j > 0)
-	{
-		count++;
-		i--;
-		j--;
-	}
-
-	if (count == AMOUNT_TO_WIN)
-		return true;
-
-	i = row + 1;
-	j = col + 1;
-
-	while (sign == getCell(i, j) && i <= ROWS && j <= COLS)
-	{
-		count++;
-		i++;
-		j++;
-	}
-	return count >= AMOUNT_TO_WIN;
-}//checkNegSlopeDiagnol
-
-bool checkPosSlopeDiagnol(int row, int col, char sign)
-{
-	int i = row + 1;
-	int j = col - 1;
-	int count = 1;
-
-	while (sign == getCell(i, j) && i <= ROWS && j > 0)
-	{
-		count++;
-		i++;
-		j--;
-	}
-
-	if (count == AMOUNT_TO_WIN)
-		return true;
-
-	i = row - 1;
-	j = col + 1;
-
-	while (sign == getCell(i, j) && i > 0 && j <= COLS)
-	{
-		count++;
-		i--;
-		j++;
-	}
-	return count >= AMOUNT_TO_WIN;
-}//checkPosSlopeDiagnol
-
-bool checkWin(int row, int col, char sign)
-{
-	return checkRow(row, col, sign) ||
-		   checkCol(row, col, sign) ||
-			  checkNegSlopeDiagnol(row, col, sign) ||
-		   checkPosSlopeDiagnol(row, col, sign);
-}//checkWin
-
-bool checkTie()
-{
-	int i;
-	for (i = 1; i <= COLS; i++)
-	{
-		if (getCell(1, i) == ' ')
-			return false;
-	}
-	return true;
-}//checkTie
-*
- *
- *
- */
