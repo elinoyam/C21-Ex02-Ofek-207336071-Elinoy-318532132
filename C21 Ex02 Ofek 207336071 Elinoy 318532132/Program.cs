@@ -65,8 +65,8 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
             }
 
             firstPlayer = new Player(false); // TODO false or with a bool const?
-
             secondPlayer = new Player(playAgainstComputer);
+           
             GameManger gm = new GameManger(mainBoard, firstPlayer, secondPlayer);
 
 

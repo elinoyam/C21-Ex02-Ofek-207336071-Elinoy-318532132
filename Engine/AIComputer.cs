@@ -1,20 +1,108 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.Remoting.Messaging;
 
 namespace Engine
 {
-    class AIComputer
+    public class AIComputer
     {
+        //https://medium.com/analytics-vidhya/artificial-intelligence-at-play-connect-four-minimax-algorithm-explained-3b5fc32e4a4f
+        // return column and in output the odd (value)
+        public int minimax(Board i_Board, int i_Row, int i_Column, char i_Sign, int i_Depth, double i_Alpha, double i_Beta, bool i_MaximizingPlayer, out double o_WinningPercentageValue)
+        {
+            Random random = new Random();
+            int column, returnedColumn;
+            List<int> possibleMoves = i_Board.GetPossibleMoves(); //GetPossibleRowsMoves
+            bool isBoardFull = i_Board.CheckIfBoardIsFull();
+            double newScore;
+
+
+            if(i_Depth == 0)
+            {
+                o_WinningPercentageValue = i_Board.CheckWinAndGetScore(i_Row, i_Column, 'O');
+                column = -1;
+            }
+            else if((isBoardFull))
+            {
+                if (i_Board.CheckWin(i_Row, i_Column, i_Sign))
+                {
+                    o_WinningPercentageValue = double.PositiveInfinity;
+                    column = -1;
+                }
+
+                else if(i_Board.CheckWin(i_Row, i_Column, 'O')) //TODO how to understand which is the X and which is the 0?
+                {
+                    o_WinningPercentageValue = double.NegativeInfinity;
+                    column = -1;
+                }
+                else //Tie- the board is full
+                {
+                    o_WinningPercentageValue = 0f; // TODO tie = 0?
+                    column = -1;
+                }
+            }
+            else
+            {
+                if(i_MaximizingPlayer)
+                {
+                    o_WinningPercentageValue = double.NegativeInfinity;
+                    column = random.Next(1, i_Board.Columns);
+                    foreach(int col in possibleMoves)
+                    {
+                        Board copiedBoard = i_Board.Copy();
+                        int row = copiedBoard.GetRowByPlayerColumnChoice(col);
+                        copiedBoard.MakeMove(col, 'O');
+                        returnedColumn = minimax(copiedBoard,row,col,'O', i_Depth - 1, i_Alpha, i_Beta, false, out newScore);
+                        if(newScore > o_WinningPercentageValue)
+                        {
+                            o_WinningPercentageValue = newScore;
+                            column = col;
+                        }
+                        i_Alpha = Math.Max(i_Alpha, o_WinningPercentageValue);
+                        if  (i_Alpha >= i_Beta)
+                        {
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    o_WinningPercentageValue = double.PositiveInfinity;
+                    column = random.Next(1, i_Board.Columns);
+                    foreach(int col in possibleMoves)
+                    {
+                        Board copiedBoard = i_Board.Copy();
+                        int row = copiedBoard.GetRowByPlayerColumnChoice(col);
+                        copiedBoard.MakeMove(col, 'X');
+                        returnedColumn = minimax(copiedBoard,row,col,'X', i_Depth - 1, i_Alpha, i_Beta, true, out newScore);
+                        if(newScore < o_WinningPercentageValue)
+                        {
+                            o_WinningPercentageValue =  newScore;
+                            column = col;
+                        }
+                        i_Beta = Math.Min(i_Beta, o_WinningPercentageValue);
+                        if(i_Alpha >= i_Beta)
+                        {
+                            break;
+                        }
+                    }
+                }
+                
+            }
+
+            
+            return column;
+        }
+
+
+        /*
         // how deep the minmax alg looks
         private const int DEEPNESS = 4;
         int Strength = 30000;
 
-        MinMax alg = new MinMax();
+        MinMaxAlgorithm alg = new MinMaxAlgorithm();
 
-        public AIPlayer()
+        public AIComputer()
         {
             Strength = 40000;
             alg.SetStrength(Strength);
@@ -61,17 +149,16 @@ namespace Engine
             //WinState? win = newBoard.CheckWinState();
             bool ifWin = GameBoard.CheckWin();
 
-            if (!ifWin && GameBoard.CheckIfBoardIsFull())
+            if(!ifWin && GameBoard.CheckIfBoardIsFull())
+            {
                 result = 0f;
-
+            }
             // if the game is going to end with the move
             else if (ifWin)
             {
-                // check if it will end with draw
-                
                 // return 1 (best) for win, and -1 (worst) for lose
                 //else if (win == WinState.BLACKWIN && Game1.AIColor == BoardState.BLACK)
-                else if (ifWin == WinState.BLACKWIN && GameBoard.CurrentPlayer == BoardState.BLACK)
+                if (ifWin == WinState.BLACKWIN && GameBoard.CurrentPlayer == BoardState.BLACK)
                     return 1f;
                 //else if (win == WinState.REDWIN && Game1.AIColor == BoardState.RED)
                 else if (ifWin == WinState.REDWIN && GameBoard.CurrentPlayer == BoardState.RED)
@@ -79,6 +166,8 @@ namespace Engine
                 else
                     return -1f;
             }
+            
+           
 
             // if we have looked forward the maximum amount
             // return the value of the move
@@ -106,6 +195,7 @@ namespace Engine
             GameBoard.Unmove(col);
 
             return value;
-        }
-    }
+        }*/
+
+}
 }

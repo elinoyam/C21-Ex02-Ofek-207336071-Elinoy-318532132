@@ -76,7 +76,6 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
         public bool CheckForTie()
         {
             bool isTie = m_Board.CheckIfBoardIsFull()  ? true  :  false;
-
             return isTie;
         }
 
@@ -93,27 +92,35 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
             bool isQuit = false;
             int playerColumnChoice;
             int availableRow;
-            char activeSign;
+            char activeSign = 'X';
                 
             //loop while the board isn't full
             while (playing && !tie)
             {
                 //print board
-                m_Board.PrintBoard();
-                
-                //get choice check if valid 
-                availableRow = getPlayerChoice(out playerColumnChoice, out isQuit);
-                if(isQuit)
+                m_Board.PrintBoard(); 
+
+                if ((m_SecondPlayer.IsComputer) && (GetActivePlayerSign() == 'O')) //TODO active player?
                 {
-                    playing = false;
-                    Ex02.ConsoleUtils.Screen.Clear();
-                    changeActivePlayer();
-                    break;
+                    m_SecondPlayer.GetComputerChoice(ref m_Board ,out availableRow,out playerColumnChoice);
+                    activeSign = 'O';
                 }
+                else
+                {
 
-                activeSign = GetActivePlayerSign();
-                m_Board.SetCell(availableRow, playerColumnChoice, activeSign);
+                    //get choice check if valid 
+                    availableRow = getPlayerChoice(out playerColumnChoice, out isQuit);
+                    if (isQuit)
+                    {
+                        playing = false;
+                        Ex02.ConsoleUtils.Screen.Clear();
+                        changeActivePlayer();
+                        break;
+                    }
 
+                    activeSign = GetActivePlayerSign();
+                    m_Board.SetCell(availableRow, playerColumnChoice, activeSign);
+                }
                 playing = !(CheckForWin(availableRow, playerColumnChoice, activeSign));
 
                 tie = CheckForTie();

@@ -10,12 +10,13 @@ namespace Engine
         private static int m_CountPlayers = 0;
         private readonly string m_PlayerName;
         private int m_CountWins = 0;
+        private AIComputer m_AIComputer = null;
 
         public bool IsComputer
         {
             get
             {
-                return IsComputer;
+                return m_IsComputer;
             }
         }
 
@@ -52,7 +53,10 @@ namespace Engine
             m_UserSign = m_CountPlayers == 0  ? 'X' : 'O';
             m_IsComputer = i_IsComputer;
             m_PlayerName = !m_IsComputer  ? $"Player {m_CountPlayers + 1}" : "Computer";
-
+            if (i_IsComputer) 
+            {
+                m_AIComputer = new AIComputer();
+            }
             //m_CountPlayers = (m_CountPlayers + 1) % 2;
 
             m_CountPlayers++;
@@ -73,8 +77,13 @@ namespace Engine
             return true;
         }
 
-        public void GetComputerChoice()
+        public void GetComputerChoice(ref Board i_Board, out int o_Row, out int o_Column)
         {
+            double winningPercentage;
+           
+            o_Column = m_AIComputer.minimax(i_Board, -1, -1,  'O',  4,  double.NegativeInfinity,  double.PositiveInfinity,  true,  out winningPercentage);
+            o_Row = i_Board.GetRowByPlayerColumnChoice(o_Column);
+            i_Board.MakeMove(o_Column, 'O');
         }
 
 

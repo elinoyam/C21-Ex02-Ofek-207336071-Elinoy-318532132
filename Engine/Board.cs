@@ -158,7 +158,7 @@ namespace Engine
 			return boardIsFull;
         }
 
-        private bool checkRowToWin(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign)
+        private bool checkRowToWin(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign, out double o_ScoreCount)
         {
             int i = i_LastColumnInsert - 1;
             int count = 1;
@@ -184,11 +184,12 @@ namespace Engine
             {
                 winExists = true;
             }
-            
+
+            o_ScoreCount = count;
             return winExists;
         } 
 
-		private bool checkColumnToWin(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign)
+		private bool checkColumnToWin(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign, out double o_ScoreCount)
         {
 			bool winExists = false;
 			int countLastingSign = 0, rowIndex = i_LastRowInsert;
@@ -203,11 +204,13 @@ namespace Engine
             {
 				winExists = true;
 			}
-		
-			return winExists;
+
+            o_ScoreCount = countLastingSign;
+
+            return winExists;
         }
 
-        private bool checkNegSlopeDiagnol(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign) // it's this \
+        private bool checkNegSlopeDiagnol(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign, out double o_ScoreCount) // it's this \
 		{
             bool winExists = false;
 			int i = i_LastRowInsert - 1;
@@ -240,10 +243,11 @@ namespace Engine
                 winExists = true;
             }
 
+            o_ScoreCount = count;
             return winExists;
         } 
 
-		private bool checkPosSlopeDiagnol(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign) 
+		private bool checkPosSlopeDiagnol(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign, out double o_ScoreCount) 
         {
 			bool winExists = false;
 			int countLastingSign = 1, rowIndex = i_LastRowInsert + 1, columnIndex = i_LastColumnInsert - 1;
@@ -275,16 +279,18 @@ namespace Engine
 				winExists = true;
 			}
 
-			return winExists;
+            o_ScoreCount = countLastingSign;
+            return winExists;
 		}
 
 
         public bool CheckWin(int row, int col, char sign)
         {
-            return checkRowToWin(row, col, sign) ||
-                   checkColumnToWin(row, col, sign) ||
-                   checkNegSlopeDiagnol(row, col, sign) ||
-                   checkPosSlopeDiagnol(row, col, sign);
+            double counter;
+            return checkRowToWin(row, col, sign, out counter) ||
+                   checkColumnToWin(row, col, sign, out counter) ||
+                   checkNegSlopeDiagnol(row, col, sign, out counter) ||
+                   checkPosSlopeDiagnol(row, col, sign, out counter);
         }
 
         public int GetRowByPlayerColumnChoice(int i_ColumnChoice)
@@ -334,9 +340,9 @@ namespace Engine
         {
             List<int> possibleMoves = new List<int>();
 
-            for (int i = 0; i < m_ColumnsNumber; i++)
+            for (int i = 1; i <= m_ColumnsNumber; i++)
             {
-                if (checkIfColumnIsFull(i))
+                if (!checkIfColumnIsFull(i))
                     possibleMoves.Add(i);
             }
             return possibleMoves;
@@ -369,7 +375,7 @@ namespace Engine
             if (checkIfValidIndex(1,i_ColumnIndex))
             {
                 // change the tile to be held by the current player
-                m_Board[GetRowByPlayerColumnChoice(i_ColumnIndex), i_ColumnIndex] = i_ActivePlayerSign;
+                m_Board[GetRowByPlayerColumnChoice(i_ColumnIndex) -1, i_ColumnIndex - 1 ] = i_ActivePlayerSign;
 
                 //// increase the amount of black or red pieces on the board
                 //// used for determining the winner
@@ -392,6 +398,24 @@ namespace Engine
                 //NextPlayer();
             }
         }
+
+        public double CheckWinAndGetScore(int i_Row, int i_Column, char i_Sign)
+        {
+            double scoreCountTotal =0, scoreCount;
+            bool isWon;
+            isWon = checkRowToWin(i_Row, i_Column, i_Sign, out scoreCount);
+            scoreCountTotal  += isWon  ? 100  : scoreCount;
+            isWon = checkColumnToWin(i_Row, i_Column, i_Sign, out scoreCount);
+            scoreCountTotal += isWon ? 100 : scoreCount;
+            isWon = checkNegSlopeDiagnol(i_Row, i_Column, i_Sign, out scoreCount);
+            scoreCountTotal += isWon ? 100 : scoreCount;
+            isWon = checkPosSlopeDiagnol(i_Row, i_Column, i_Sign, out scoreCount);
+            scoreCountTotal += isWon ? 100 : scoreCount;
+
+            return scoreCountTotal;
+        }
+
+
 
     }
 }
