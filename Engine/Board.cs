@@ -376,47 +376,142 @@ namespace Engine
             {
                 // change the tile to be held by the current player
                 m_Board[GetRowByPlayerColumnChoice(i_ColumnIndex) -1, i_ColumnIndex - 1 ] = i_ActivePlayerSign;
-
-                //// increase the amount of black or red pieces on the board
-                //// used for determining the winner
-                //long position = ((long)1 << (tilesPerColumn[i_ColumnIndex] + 7 * i_ColumnIndex));
-                //if (CurrentPlayer == BoardState.BLACK)
-                //    numBlack ^= position;
-                //else
-                //    numRed ^= position;
-
-                //// increase the number of tiles in the column
-                //tilesPerColumn[i_ColumnIndex]++;
-
-                // check for a winner otherwise proceed to next player
-                /*if ((Winner = CheckWinState()) != null)
-                {
-                    isGameOver = true;
-                    return;
-                }
-                else*/
-                //NextPlayer();
             }
         }
 
         public double CheckWinAndGetScore(int i_Row, int i_Column, char i_Sign)
         {
-            double scoreCountTotal =0, scoreCount;
-            bool isWon;
-            isWon = checkRowToWin(i_Row, i_Column, i_Sign, out scoreCount);
-            scoreCountTotal  += isWon  ? 100  : scoreCount;
-            isWon = checkColumnToWin(i_Row, i_Column, i_Sign, out scoreCount);
-            scoreCountTotal += isWon ? 100 : scoreCount;
-            isWon = checkNegSlopeDiagnol(i_Row, i_Column, i_Sign, out scoreCount);
-            scoreCountTotal += isWon ? 100 : scoreCount;
-            isWon = checkPosSlopeDiagnol(i_Row, i_Column, i_Sign, out scoreCount);
-            scoreCountTotal += isWon ? 100 : scoreCount;
+            double scoreCountTotal = 0;
+            int countCenter = 0;
+            int centerColumn = (Columns % 2 == 0) ? (Columns / 2) : ((Columns / 2) + 1);
+
+
+            // Score center column
+            for (int i = 1; i <= Rows; ++i)
+            {
+                if (GetCell(i, centerColumn) == i_Sign)
+                {
+                    ++countCenter;
+                }
+            }
+
+            scoreCountTotal += countCenter * 3;
+
+
+            // Score Horizontal - ROW
+            for(int i = 1; i <= Rows; ++i)
+            {
+                for(int j = 1; j <= Columns-3; ++j)
+                {
+                    char[] window = new char[4];
+                    for(int k = 0; k < 4; ++k)
+                    {
+                        window[k] = GetCell(i, j+k);
+                    }
+
+                    scoreCountTotal += evaluate_window(window, i_Sign);
+                }
+            }
+
+            
+            // Score Vertical = COL
+            for (int i = 1; i <= Columns; ++i)
+            {
+                for (int j = 1; j <= Rows - 3; ++j)
+                {
+                    char[] window = new char[4];
+                    for (int k = 0; k < 4; ++k)
+                    {
+                        window[k] = GetCell(j+k, i);
+                    }
+
+                    scoreCountTotal += evaluate_window(window, i_Sign);
+                }
+            }
+
+            // Score negative sloped diagonal   \
+            for (int i = 1; i <= Rows - 3; ++i)
+            {
+                for (int j = 1; j <= Columns - 3; ++j)
+                {
+                    char[] window = new char[4];
+                    for (int k = 0; k < 4; ++k)
+                    {
+                        window[k] = GetCell(i + k, j+k);
+                    }
+
+                    scoreCountTotal += evaluate_window(window, i_Sign);
+                }
+            }
+            
+            // Score positive sloped diagonal  /
+            for (int i = 1; i <= Rows - 3; ++i)
+            {
+                for (int j = 1; j <= Columns - 3; ++j)
+                {
+                    char[] window = new char[4];
+                    for (int k = 0; k < 4; ++k)
+                    {
+                        window[k] = GetCell(i + 3 - k, j + k);
+                    }
+
+                    scoreCountTotal += evaluate_window(window, i_Sign);
+                }
+            }
 
             return scoreCountTotal;
         }
 
 
+        public int evaluate_window(char[] i_Window, char i_Sign)
+        {
+            int score = 0;
+            int counterMySign = 0;
+            int counterOpponentSign = 0;
+            int counterEmptySign = 0;
 
+            char opp_piece = 'X'; //TODO const (define) to the AI SIGN and Player sign
+            if(i_Sign == opp_piece)
+            {
+                opp_piece = 'O';
+            }
+
+            for(int i = 0; i < 4; ++i)
+            {
+                if(i_Window[i] == i_Sign)
+                {
+                    ++counterMySign;
+                }
+                else if(i_Window[i] == opp_piece)
+                {
+                    ++counterOpponentSign;
+                }
+                else
+                {
+                    ++counterEmptySign;
+                }
+            }
+
+            switch(counterMySign)
+            {
+                case 4:
+                    score += 100;
+                    break;
+                case 3:
+                    score += 5;
+                    break;
+                case 2:
+                    score += 2;
+                    break;
+            }
+
+            if ((counterOpponentSign == 3) && (counterEmptySign == 1))
+            {
+                score -= 8;
+            }
+
+            return score;
+        }
     }
 }
 

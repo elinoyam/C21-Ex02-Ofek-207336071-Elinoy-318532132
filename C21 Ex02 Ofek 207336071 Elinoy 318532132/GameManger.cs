@@ -86,6 +86,7 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
 
         public void GameLoop()
         {
+            Ex02.ConsoleUtils.Screen.Clear();
             m_Board.InitBoard();
             bool playing = true;
             bool tie = false;
@@ -133,16 +134,16 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
             if(!isQuit)
             {
                 m_Board.PrintBoard();
+                changeActivePlayer();
             }
 
 
             // TODO tell who won and show the count 1-2
-            if(tie)
+            if (tie && playing)
             {
-                Console.WriteLine($"It's a tie!!! Better luck next time....");
+                Console.WriteLine("It's a tie!!! Better luck next time....");
                 Console.WriteLine($"{m_FirstPlayer.PlayerName} has won: {m_FirstPlayer.PlayerWinsCounter}. ");
                 Console.WriteLine($"{m_SecondPlayer.PlayerName} has won: {m_SecondPlayer.PlayerWinsCounter}. ");
-
             }
             else
             {
