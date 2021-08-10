@@ -5,10 +5,12 @@ namespace Engine
 {
     public class Player
     {
-        private readonly bool m_IsComputer;
-        private readonly char m_UserSign;
-        private static int m_CountPlayers = 0;
-        private readonly string m_PlayerName;
+        public const char k_Player1Sign = 'X';
+        public const char k_Player2Sign = 'O';
+        private readonly bool r_IsComputer;
+        private readonly char r_UserSign;
+        private static int s_CountPlayers = 0;
+        private readonly string r_PlayerName;
         private int m_CountWins = 0;
         private AIComputer m_AIComputer = null;
 
@@ -16,7 +18,7 @@ namespace Engine
         {
             get
             {
-                return m_IsComputer;
+                return r_IsComputer;
             }
         }
 
@@ -24,7 +26,7 @@ namespace Engine
         {
             get
             {
-                return m_UserSign;
+                return r_UserSign;
             }
         }
 
@@ -32,7 +34,7 @@ namespace Engine
         {
             get
             {
-                return m_PlayerName;
+                return r_PlayerName;
             }
         }
 
@@ -50,19 +52,18 @@ namespace Engine
 
         public Player(bool i_IsComputer)
         {
-            m_UserSign = m_CountPlayers == 0  ? 'X' : 'O';
-            m_IsComputer = i_IsComputer;
-            m_PlayerName = !m_IsComputer  ? $"Player {m_CountPlayers + 1}" : "Computer";
+            r_UserSign = s_CountPlayers == 0  ? k_Player1Sign : k_Player2Sign;
+            r_IsComputer = i_IsComputer;
+            r_PlayerName = !r_IsComputer  ? $"Player {s_CountPlayers + 1}" : "Computer";
             if (i_IsComputer) 
             {
                 m_AIComputer = new AIComputer();
             }
-            //m_CountPlayers = (m_CountPlayers + 1) % 2;
 
-            m_CountPlayers++;
-            if(m_CountPlayers >= 2)
+            s_CountPlayers++;
+            if(s_CountPlayers >= 2)
             {
-                m_CountPlayers = 0;
+                s_CountPlayers = 0;
             }
         }
 
@@ -71,22 +72,14 @@ namespace Engine
             ++PlayerWinsCounter;
         }
 
-        private bool checkPlayerChoice(int i_Col)
-        {
-
-            return true;
-        }
-
         public void GetComputerChoice(ref Board i_Board, out int o_Row, out int o_Column)
         {
             double winningPercentage;
+            const bool v_IsMaxPlayer = true;
            
-            o_Column = m_AIComputer.minimax(i_Board, -1, -1,  'O',  4,  double.NegativeInfinity,  double.PositiveInfinity,  true,  out winningPercentage);
+            o_Column = m_AIComputer.MinimaxAlgorithm(i_Board, AIComputer.k_UndefinedRowOrColumn, AIComputer.k_UndefinedRowOrColumn, k_Player2Sign,  Board.k_AmountToWin,  double.NegativeInfinity,  double.PositiveInfinity, v_IsMaxPlayer,  out winningPercentage);
             o_Row = i_Board.GetRowByPlayerColumnChoice(o_Column);
-            i_Board.MakeMove(o_Column, 'O');
+            i_Board.MakeMove(o_Column, k_Player2Sign);
         }
-
-
-
     }
 }

@@ -5,19 +5,21 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
 {
     class GameManger
     {
+        private const char k_Player1Sign = 'X';
+        private const char k_Player2Sign = 'O';
         private Board m_Board;
-        private readonly Player m_FirstPlayer;
-        private readonly Player m_SecondPlayer;
-        private bool m_firstPlayerTurn = true; // true = player1, false = player2
+        private readonly Player r_FirstPlayer;
+        private readonly Player r_SecondPlayer;
+        private bool m_FirstPlayerTurn = true; // true = player1, false = player2
 
         public GameManger(Board i_Board, Player i_First, Player i_Second)
         {
             m_Board = i_Board;
-            m_FirstPlayer = i_First;
-            m_SecondPlayer = i_Second;
+            r_FirstPlayer = i_First;
+            r_SecondPlayer = i_Second;
         }
 
-        public int getPlayerChoice(out int o_ColumnChoice, out bool o_ToQuit)
+        public int GetPlayerChoice(out int o_ColumnChoice, out bool o_ToQuit)
         {
             bool choiceValid = false;
             int columnChoice = 0;
@@ -36,8 +38,7 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
 
                 if(goodInput)
                 {
-                    // 1 <= columnChoice <= Columns 
-                    if(1 <= columnChoice && m_Board.Columns >= columnChoice)
+                    if(1 <= columnChoice && (m_Board.Columns >= columnChoice))
                     {
                         rowChoice = m_Board.GetRowByPlayerColumnChoice(columnChoice);
                         if(rowChoice != -1)
@@ -75,8 +76,7 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
 
         public bool CheckForTie()
         {
-            bool isTie = m_Board.CheckIfBoardIsFull()  ? true  :  false;
-            return isTie;
+            return m_Board.CheckIfBoardIsFull();
         }
 
         public bool CheckForWin(int i_Row, int i_Column, char i_Sign)
@@ -86,31 +86,27 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
 
         public void GameLoop()
         {
-            Ex02.ConsoleUtils.Screen.Clear();
-            m_Board.InitBoard();
             bool playing = true;
             bool tie = false;
             bool isQuit = false;
             int playerColumnChoice;
             int availableRow;
-            char activeSign = 'X';
-                
-            //loop while the board isn't full
+            char activeSign = k_Player1Sign;
+
+            Ex02.ConsoleUtils.Screen.Clear();
+            m_Board.InitBoard();
+            //loop while the board isn't full and the game isn't over
             while (playing && !tie)
             {
-                //print board
                 m_Board.PrintBoard(); 
-
-                if ((m_SecondPlayer.IsComputer) && (GetActivePlayerSign() == 'O')) //TODO active player?
+                if ((r_SecondPlayer.IsComputer) && (GetActivePlayerSign() == k_Player2Sign)) 
                 {
-                    m_SecondPlayer.GetComputerChoice(ref m_Board ,out availableRow,out playerColumnChoice);
-                    activeSign = 'O';
+                    r_SecondPlayer.GetComputerChoice(ref m_Board ,out availableRow,out playerColumnChoice);
+                    activeSign = k_Player2Sign;
                 }
                 else
                 {
-
-                    //get choice check if valid 
-                    availableRow = getPlayerChoice(out playerColumnChoice, out isQuit);
+                    availableRow = GetPlayerChoice(out playerColumnChoice, out isQuit);
                     if (isQuit)
                     {
                         playing = false;
@@ -122,12 +118,10 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
                     activeSign = GetActivePlayerSign();
                     m_Board.SetCell(availableRow, playerColumnChoice, activeSign);
                 }
+
                 playing = !(CheckForWin(availableRow, playerColumnChoice, activeSign));
-
                 tie = CheckForTie();
-
                 changeActivePlayer();
-
                 Ex02.ConsoleUtils.Screen.Clear();
             }
 
@@ -137,43 +131,38 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
                 changeActivePlayer();
             }
 
-
-            // TODO tell who won and show the count 1-2
-            if (tie && playing)
+            if (tie && playing)     
             {
                 Console.WriteLine("It's a tie!!! Better luck next time....");
-                Console.WriteLine($"{m_FirstPlayer.PlayerName} has won: {m_FirstPlayer.PlayerWinsCounter}. ");
-                Console.WriteLine($"{m_SecondPlayer.PlayerName} has won: {m_SecondPlayer.PlayerWinsCounter}. ");
+                Console.WriteLine($"{r_FirstPlayer.PlayerName} has won: {r_FirstPlayer.PlayerWinsCounter}. ");
+                Console.WriteLine($"{r_SecondPlayer.PlayerName} has won: {r_SecondPlayer.PlayerWinsCounter}. ");
             }
             else
             {
                 PrintWins();
             }
-
-            // TODO new game will be at main
         }
 
         public char GetActivePlayerSign()
         {
-            char activeSign = m_firstPlayerTurn  ? m_FirstPlayer.PlayerSign :  m_SecondPlayer.PlayerSign;
+            char activeSign = m_FirstPlayerTurn  ? r_FirstPlayer.PlayerSign :  r_SecondPlayer.PlayerSign;
 
             return activeSign;
         }
 
         private void changeActivePlayer()
         {
-            m_firstPlayerTurn = !m_firstPlayerTurn;    
+            m_FirstPlayerTurn = !m_FirstPlayerTurn;    
         }
 
         public void PrintWins()
         {
-            Player winner = (!m_firstPlayerTurn) ? m_SecondPlayer  :  m_FirstPlayer;
+            Player winner = (!m_FirstPlayerTurn) ? r_SecondPlayer  :  r_FirstPlayer;
+
             winner.IncreaseWinsCounter();
             Console.WriteLine($"Congratulations! {winner.PlayerName} won this game !!!");
-            Console.WriteLine($"{m_FirstPlayer.PlayerName} has won: {m_FirstPlayer.PlayerWinsCounter}. ");
-            Console.WriteLine($"{m_SecondPlayer.PlayerName} has won: {m_SecondPlayer.PlayerWinsCounter}. ");
+            Console.WriteLine($"{r_FirstPlayer.PlayerName} has won: {r_FirstPlayer.PlayerWinsCounter}. ");
+            Console.WriteLine($"{r_SecondPlayer.PlayerName} has won: {r_SecondPlayer.PlayerWinsCounter}. ");
         }
-
-
     }
 }

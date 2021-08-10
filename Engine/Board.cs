@@ -5,37 +5,36 @@ namespace Engine
 {
     public class Board
     {
-		private const int k_AmountToWin = 4;
-        private readonly int m_RowsNumber;
-        private readonly int m_ColumnsNumber;
+		public const int k_AmountToWin = 4;
+        private readonly int r_RowsNumber;
+        private readonly int r_ColumnsNumber;
         private char[,] m_Board;
 
         public int Rows
         {
             get
             {
-                return m_RowsNumber;
+                return r_RowsNumber;
             }
         }
         public int Columns
         {
             get
             {
-                return m_ColumnsNumber;
+                return r_ColumnsNumber;
             }
         }
 
         public Board(int i_RowsNumber, int i_ColumnsNumber)
         {
-            // check if legal? 4-8
-            if(!(isValidBoard(i_RowsNumber, i_ColumnsNumber)))
+            if(!(isValidBoard(i_RowsNumber, i_ColumnsNumber))) 
             {
 				throw new Exception("Error! the number of rows and columns should be between 4 to 8");
 			}
 
-			m_RowsNumber = i_RowsNumber;
-			m_ColumnsNumber = i_ColumnsNumber;
-			m_Board = new char[m_RowsNumber, m_ColumnsNumber];
+			r_RowsNumber = i_RowsNumber;
+			r_ColumnsNumber = i_ColumnsNumber;
+			m_Board = new char[r_RowsNumber, r_ColumnsNumber];
 			InitBoard();
         }
 
@@ -77,8 +76,7 @@ namespace Engine
             {
                 for (int currentColumn = 0; currentColumn < Columns; currentColumn++)
                 {
-                    Console.Write($"|  {GetCell(currentRow+1, currentColumn+1)}  "); //2  blank spaces from each side
-
+                    Console.Write($"|  {GetCell(currentRow + 1, currentColumn + 1)}  "); //2  blank spaces from each side
 				}
 
 				Console.WriteLine("|"); // add closing to the last one
@@ -86,8 +84,8 @@ namespace Engine
 				for (int currentColumn = 0; currentColumn < Columns; currentColumn++)
                 {
                     Console.Write("======"); //3  blank spaces from each side
-
                 }
+
 				Console.WriteLine(""); 
 			}
         }
@@ -99,7 +97,7 @@ namespace Engine
                 throw new Exception("Error! The given indexs are not valid - outside of board boundries.");
             }
 
-            return m_Board[i_ChosenRow-1, i_ChosenColumn-1];
+            return m_Board[i_ChosenRow - 1, i_ChosenColumn - 1];
         }
 
         public void SetCell(int i_ChosenRow, int i_ChosenColumn, char i_CellInput)
@@ -109,12 +107,13 @@ namespace Engine
                 throw new Exception("Error! The given indexs are not valid - outside of board boundries.");
             }
 
-            m_Board[i_ChosenRow-1, i_ChosenColumn-1] = i_CellInput;
+            m_Board[i_ChosenRow - 1, i_ChosenColumn - 1] = i_CellInput;
         }
 
         private bool checkIfValidIndex(int i_ChosenRow, int i_ChosenColumn)
         {
             bool isValid = true;
+
             if(i_ChosenRow > Rows || i_ChosenRow < 1)
             {
                 isValid = false;
@@ -135,7 +134,8 @@ namespace Engine
             {
 				throw new Exception("Error! The given indexs are not valid - outside of board boundries.");
 			}
-			if(m_Board[0,i_ColumnNumber-1] != ' ')
+
+			if(m_Board[0, i_ColumnNumber - 1] != ' ')
             {
 				columnIsFull = true;
             }
@@ -147,7 +147,7 @@ namespace Engine
         {
 			bool boardIsFull = true;
 
-			for(int i = 0; i < Columns && boardIsFull;  i++)
+			for(int i = 0; i < Columns && boardIsFull; i++)
             {
                 if (!checkIfColumnIsFull(i + 1))
                 {
@@ -158,43 +158,43 @@ namespace Engine
 			return boardIsFull;
         }
 
-        private bool checkRowToWin(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign, out double o_ScoreCount)
-        {
-            int i = i_LastColumnInsert - 1;
-            int count = 1;
+        private bool checkRowToWin(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign)
+        {  
+            int columnIndex = i_LastColumnInsert - 1;
+            int countLastingSign = 1;
             bool winExists = false;
 
-			while ((i > 0) && i_UserSign == GetCell(i_LastRowInsert, i) )
+			while ((columnIndex > 0) && i_UserSign == GetCell(i_LastRowInsert, columnIndex))
             {
-                ++count;
-                --i;
+                ++countLastingSign;
+                --columnIndex;
             }
 
-            if(count < k_AmountToWin)
+            if(countLastingSign < k_AmountToWin)
             {
-                i = i_LastColumnInsert + 1;
-                while((i <= Columns) && i_UserSign == GetCell(i_LastRowInsert, i) )
+                columnIndex = i_LastColumnInsert + 1;
+                while((columnIndex <= Columns) && i_UserSign == GetCell(i_LastRowInsert, columnIndex))
                 {
-                    ++count;
-                    ++i;
+                    ++countLastingSign;
+                    ++columnIndex;
                 }
-                winExists = (count >= k_AmountToWin);
+
+                winExists = (countLastingSign >= k_AmountToWin);
 			}
             else
             {
                 winExists = true;
             }
 
-            o_ScoreCount = count;
             return winExists;
         } 
 
-		private bool checkColumnToWin(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign, out double o_ScoreCount)
+		private bool checkColumnToWin(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign)
         {
 			bool winExists = false;
 			int countLastingSign = 0, rowIndex = i_LastRowInsert;
 
-			while ((rowIndex <= Rows) && i_UserSign == GetCell(rowIndex, i_LastColumnInsert) )
+			while ((rowIndex <= Rows) && i_UserSign == GetCell(rowIndex, i_LastColumnInsert))
 			{
 				countLastingSign++;
 				rowIndex++;
@@ -205,49 +205,46 @@ namespace Engine
 				winExists = true;
 			}
 
-            o_ScoreCount = countLastingSign;
-
             return winExists;
         }
 
-        private bool checkNegSlopeDiagnol(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign, out double o_ScoreCount) // it's this \
-		{
+        private bool checkNegativeSlopeDiagnol(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign) // Negative Slope = \
+        {
             bool winExists = false;
-			int i = i_LastRowInsert - 1;
-            int j = i_LastColumnInsert - 1;
-            int count = 1;
+			int rowIndex = i_LastRowInsert - 1;
+            int columnIndex = i_LastColumnInsert - 1;
+            int countLastingSign = 1;
 
-            while (i > 0 && j > 0 && i_UserSign == GetCell(i, j))
+            while (rowIndex > 0 && columnIndex > 0 && i_UserSign == GetCell(rowIndex, columnIndex))
             {
-                count++;
-                i--;
-                j--;
+                countLastingSign++;
+                rowIndex--;
+                columnIndex--;
             }
 
-            if(count < k_AmountToWin)
+            if(countLastingSign < k_AmountToWin)
             {
-                i = i_LastRowInsert + 1;
-                j = i_LastColumnInsert + 1;
+                rowIndex = i_LastRowInsert + 1;
+                columnIndex = i_LastColumnInsert + 1;
 
-                while(i <= Rows && j <= Columns && i_UserSign == GetCell(i, j))
+                while(rowIndex <= Rows && columnIndex <= Columns && i_UserSign == GetCell(rowIndex, columnIndex))
                 {
-                    count++;
-                    i++;
-                    j++;
+                    countLastingSign++;
+                    rowIndex++;
+                    columnIndex++;
                 }
 
-                winExists = (count >= k_AmountToWin);
+                winExists = (countLastingSign >= k_AmountToWin);
             }
 			else
             {
                 winExists = true;
             }
 
-            o_ScoreCount = count;
             return winExists;
         } 
 
-		private bool checkPosSlopeDiagnol(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign, out double o_ScoreCount) 
+		private bool checkPositiveSlopeDiagnol(int i_LastRowInsert, int i_LastColumnInsert, char i_UserSign) // Positive Slope = /
         {
 			bool winExists = false;
 			int countLastingSign = 1, rowIndex = i_LastRowInsert + 1, columnIndex = i_LastColumnInsert - 1;
@@ -258,16 +255,15 @@ namespace Engine
 				rowIndex++;
 				columnIndex--;
 			}
+
 			if (countLastingSign >= k_AmountToWin)
             {
 				winExists = true;
-
 			}
 
 			rowIndex = i_LastRowInsert - 1;
 			columnIndex = i_LastColumnInsert + 1;
-
-			while (!winExists && (rowIndex > 0 && columnIndex <= Columns) && i_UserSign == GetCell(rowIndex, columnIndex))
+            while (!winExists && (rowIndex > 0 && columnIndex <= Columns) && i_UserSign == GetCell(rowIndex, columnIndex))
 			{
 				countLastingSign++;
 				rowIndex--;
@@ -279,18 +275,15 @@ namespace Engine
 				winExists = true;
 			}
 
-            o_ScoreCount = countLastingSign;
             return winExists;
 		}
 
-
-        public bool CheckWin(int row, int col, char sign)
+        public bool CheckWin(int i_RowIndex, int i_ColumnIndex, char i_UserSign)
         {
-            double counter;
-            return checkRowToWin(row, col, sign, out counter) ||
-                   checkColumnToWin(row, col, sign, out counter) ||
-                   checkNegSlopeDiagnol(row, col, sign, out counter) ||
-                   checkPosSlopeDiagnol(row, col, sign, out counter);
+            return checkRowToWin(i_RowIndex, i_ColumnIndex, i_UserSign) ||
+                   checkColumnToWin(i_RowIndex, i_ColumnIndex, i_UserSign) ||
+                   checkNegativeSlopeDiagnol(i_RowIndex, i_ColumnIndex, i_UserSign) ||
+                   checkPositiveSlopeDiagnol(i_RowIndex, i_ColumnIndex, i_UserSign);
         }
 
         public int GetRowByPlayerColumnChoice(int i_ColumnChoice)
@@ -299,9 +292,9 @@ namespace Engine
 
             for(int rowIndex = Rows - 1; rowIndex >= 0; --rowIndex)
             {
-				if (GetCell(rowIndex+1, i_ColumnChoice) == ' ')
+				if (GetCell(rowIndex + 1, i_ColumnChoice) == ' ')
                 {
-                    returnRowIndex = rowIndex+1;
+                    returnRowIndex = rowIndex + 1;
                     break;
                 }
             }
@@ -309,209 +302,42 @@ namespace Engine
             return returnRowIndex;
         }
 
-        // remove the last move made and change back to the other player
-        public void Unmove(int i_Col)
-        {
-			//find the place
-            for(int i = 0; i < m_ColumnsNumber; ++i)
-            {
-                if (GetCell(i+1, i_Col) != ' ')
-                {
-                    SetCell(i + 1, i_Col, ' ');
-                    //returnRowIndex = rowIndex + 1;
-                    break;
-                }
-			}
-            //tilesPerColumn[col]--;
-
-            //long position = ((long)1 << (tilesPerColumn[col] + 7 * col));
-
-            //if (CurrentOpponent == BoardState.BLACK)
-            //    numBlack ^= position;
-            //else
-            //    numRed ^= position;
-
-            //theBoard[tilesPerColumn[col], col] = BoardState.EMPTY;
-
-        }
-
-        // Gets all possible moves (7 or less) for the AI player
-        public List<int> GetPossibleMoves()
-        {
-            List<int> possibleMoves = new List<int>();
-
-            for (int i = 1; i <= m_ColumnsNumber; i++)
-            {
-                if (!checkIfColumnIsFull(i))
-                    possibleMoves.Add(i);
-            }
-            return possibleMoves;
-        }
-
         public Board Copy()
         {
             Board newBoard = new Board(Rows, Columns);
-            //newBoard.CurrentPlayer = this.CurrentPlayer;
-            //newBoard.CurrentOpponent = this.CurrentOpponent;
-            //newBoard.numRed = this.numRed;
-            //newBoard.numBlack = this.numBlack;
-            //for (int i = 0; i < Width; i++)
-            //    newBoard.tilesPerColumn[i] = this.tilesPerColumn[i];
 
             for (int i = 0; i < Rows; i++)
             {
                 for (int j = 0; j < Columns; j++)
+                {
                     newBoard.m_Board[i, j] = this.m_Board[i, j];
+                }
             }
-            //newBoard.isGameOver = this.isGameOver;
-            //newBoard.Winner = this.Winner;
 
             return newBoard;
         }
 
         public void MakeMove(int i_ColumnIndex, char i_ActivePlayerSign)
         {
-            // Check if the move is valid, then place the piece
-            if (checkIfValidIndex(1,i_ColumnIndex))
+            if (checkIfValidIndex(1, i_ColumnIndex))
             {
-                // change the tile to be held by the current player
-                m_Board[GetRowByPlayerColumnChoice(i_ColumnIndex) -1, i_ColumnIndex - 1 ] = i_ActivePlayerSign;
+                m_Board[GetRowByPlayerColumnChoice(i_ColumnIndex) - 1, i_ColumnIndex - 1] = i_ActivePlayerSign;
             }
         }
 
-        public double CheckWinAndGetScore(int i_Row, int i_Column, char i_Sign)
+        public List<int> GetPossibleMoves()     
         {
-            double scoreCountTotal = 0;
-            int countCenter = 0;
-            int centerColumn = (Columns % 2 == 0) ? (Columns / 2) : ((Columns / 2) + 1);
+            List<int> possibleMovesList = new List<int>();
 
-
-            // Score center column
-            for (int i = 1; i <= Rows; ++i)
+            for (int i = 1; i <= Columns; i++)
             {
-                if (GetCell(i, centerColumn) == i_Sign)
+                if (!checkIfColumnIsFull(i))
                 {
-                    ++countCenter;
+                    possibleMovesList.Add(i);
                 }
             }
 
-            scoreCountTotal += countCenter * 3;
-
-
-            // Score Horizontal - ROW
-            for(int i = 1; i <= Rows; ++i)
-            {
-                for(int j = 1; j <= Columns-3; ++j)
-                {
-                    char[] window = new char[4];
-                    for(int k = 0; k < 4; ++k)
-                    {
-                        window[k] = GetCell(i, j+k);
-                    }
-
-                    scoreCountTotal += evaluate_window(window, i_Sign);
-                }
-            }
-
-            
-            // Score Vertical = COL
-            for (int i = 1; i <= Columns; ++i)
-            {
-                for (int j = 1; j <= Rows - 3; ++j)
-                {
-                    char[] window = new char[4];
-                    for (int k = 0; k < 4; ++k)
-                    {
-                        window[k] = GetCell(j+k, i);
-                    }
-
-                    scoreCountTotal += evaluate_window(window, i_Sign);
-                }
-            }
-
-            // Score negative sloped diagonal   \
-            for (int i = 1; i <= Rows - 3; ++i)
-            {
-                for (int j = 1; j <= Columns - 3; ++j)
-                {
-                    char[] window = new char[4];
-                    for (int k = 0; k < 4; ++k)
-                    {
-                        window[k] = GetCell(i + k, j+k);
-                    }
-
-                    scoreCountTotal += evaluate_window(window, i_Sign);
-                }
-            }
-            
-            // Score positive sloped diagonal  /
-            for (int i = 1; i <= Rows - 3; ++i)
-            {
-                for (int j = 1; j <= Columns - 3; ++j)
-                {
-                    char[] window = new char[4];
-                    for (int k = 0; k < 4; ++k)
-                    {
-                        window[k] = GetCell(i + 3 - k, j + k);
-                    }
-
-                    scoreCountTotal += evaluate_window(window, i_Sign);
-                }
-            }
-
-            return scoreCountTotal;
-        }
-
-
-        public int evaluate_window(char[] i_Window, char i_Sign)
-        {
-            int score = 0;
-            int counterMySign = 0;
-            int counterOpponentSign = 0;
-            int counterEmptySign = 0;
-
-            char opp_piece = 'X'; //TODO const (define) to the AI SIGN and Player sign
-            if(i_Sign == opp_piece)
-            {
-                opp_piece = 'O';
-            }
-
-            for(int i = 0; i < 4; ++i)
-            {
-                if(i_Window[i] == i_Sign)
-                {
-                    ++counterMySign;
-                }
-                else if(i_Window[i] == opp_piece)
-                {
-                    ++counterOpponentSign;
-                }
-                else
-                {
-                    ++counterEmptySign;
-                }
-            }
-
-            switch(counterMySign)
-            {
-                case 4:
-                    score += 100;
-                    break;
-                case 3:
-                    score += 5;
-                    break;
-                case 2:
-                    score += 2;
-                    break;
-            }
-
-            if ((counterOpponentSign == 3) && (counterEmptySign == 1))
-            {
-                score -= 8;
-            }
-
-            return score;
+            return possibleMovesList;
         }
     }
 }
-
