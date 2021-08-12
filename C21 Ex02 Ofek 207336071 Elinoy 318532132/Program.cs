@@ -70,6 +70,7 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
                 }
                 catch (Exception exception)
                 {
+                    goodInput = false;
                     Console.WriteLine(exception.Message);
                 }
             }

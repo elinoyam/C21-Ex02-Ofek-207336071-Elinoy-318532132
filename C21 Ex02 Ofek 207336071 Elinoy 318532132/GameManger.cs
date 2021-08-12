@@ -58,7 +58,7 @@ namespace C21_Ex02_Ofek_207336071_Elinoy_318532132
                 }
                 else
                 {
-                    if (inputFromUser == "Q")
+                    if (inputFromUser.ToUpper() == "Q")
                     {
                         o_ToQuit = true;
                         o_ColumnChoice = -1;

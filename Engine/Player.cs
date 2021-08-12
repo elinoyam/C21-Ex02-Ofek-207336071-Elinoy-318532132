@@ -77,7 +77,7 @@ namespace Engine
             double winningPercentage;
             const bool v_IsMaxPlayer = true;
            
-            o_Column = m_AIComputer.MinimaxAlgorithm(i_Board, AIComputer.k_UndefinedRowOrColumn, AIComputer.k_UndefinedRowOrColumn, k_Player2Sign,  Board.k_AmountToWin,  double.NegativeInfinity,  double.PositiveInfinity, v_IsMaxPlayer,  out winningPercentage);
+            o_Column = m_AIComputer.MinimaxAlgorithm(ref i_Board, AIComputer.k_UndefinedRowOrColumn, AIComputer.k_UndefinedRowOrColumn, k_Player2Sign,  Board.k_AmountToWin,  double.NegativeInfinity,  double.PositiveInfinity, v_IsMaxPlayer,  out winningPercentage);
             o_Row = i_Board.GetRowByPlayerColumnChoice(o_Column);
             i_Board.MakeMove(o_Column, k_Player2Sign);
         }

@@ -9,10 +9,10 @@ namespace Engine
         private const int k_Connect4Move = 100;
         private const int k_Connect3Move = 5;
         private const int k_Connect2Move = 2;
-        private const int k_OpponentConnect3Move = 50;
+        private const int k_OpponentConnect3Move = 10;
 
         // return the column and in the output the win percentage value for this column
-        public int MinimaxAlgorithm(Board i_Board, int i_Row, int i_Column, char i_Sign, int i_Depth, double i_Alpha, double i_Beta, bool i_MaximizingPlayer, out double o_WinningPercentageValue)
+        public int MinimaxAlgorithm(ref Board i_Board, int i_Row, int i_Column, char i_Sign, int i_Depth, double i_Alpha, double i_Beta, bool i_MaximizingPlayer, out double o_WinningPercentageValue)
         {
             Random random = new Random();
             int column, returnedColumn;
@@ -55,7 +55,7 @@ namespace Engine
                         Board copiedBoard = i_Board.Copy();
                         int availableRowByCloumnChoice = copiedBoard.GetRowByPlayerColumnChoice(currentColumn);
                         copiedBoard.MakeMove(currentColumn, Player.k_Player2Sign);
-                        returnedColumn = MinimaxAlgorithm(copiedBoard,availableRowByCloumnChoice,currentColumn, Player.k_Player2Sign, i_Depth - 1, i_Alpha, i_Beta, !v_MaxPlayer, out newScore);
+                        returnedColumn = MinimaxAlgorithm(ref copiedBoard,availableRowByCloumnChoice,currentColumn, Player.k_Player2Sign, i_Depth - 1, i_Alpha, i_Beta, !v_MaxPlayer, out newScore);
                         if(newScore > o_WinningPercentageValue)
                         {
                             o_WinningPercentageValue = newScore;
@@ -78,7 +78,7 @@ namespace Engine
                         Board copiedBoard = i_Board.Copy();
                         int availableRowByCloumnChoice = copiedBoard.GetRowByPlayerColumnChoice(currentColumn);
                         copiedBoard.MakeMove(currentColumn, Player.k_Player1Sign);
-                        returnedColumn = MinimaxAlgorithm(copiedBoard,availableRowByCloumnChoice,currentColumn, Player.k_Player1Sign, i_Depth - 1, i_Alpha, i_Beta, v_MaxPlayer, out newScore);
+                        returnedColumn = MinimaxAlgorithm(ref copiedBoard,availableRowByCloumnChoice,currentColumn, Player.k_Player1Sign, i_Depth - 1, i_Alpha, i_Beta, v_MaxPlayer, out newScore);
                         if(newScore < o_WinningPercentageValue)
                         {
                             o_WinningPercentageValue =  newScore;
